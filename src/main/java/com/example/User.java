@@ -1,19 +1,12 @@
-package com.example;
-
+package com.example.socialnetwork;
 import jakarta.persistence.*;
+import lombok.Data;
 
-@Entity
-@Table(name = "users")
+@Entity @Table(name = "users") @Data
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String email;
     private String password;
-
-    public User() {} // Пустой конструктор для JPA
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    private String username;
 }

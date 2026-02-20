@@ -1,57 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>VOLE Messenger</title>
     <meta charset="UTF-8">
+    <title>VOLE Messenger - Настоящая регистрация</title>
     <style>
-        body { font-family: Arial; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 400px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 350px; }
+        h2 { text-align: center; color: #1877f2; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #166fe5; }
         .post { border-bottom: 1px solid #eee; padding: 10px 0; }
-        .post-author { font-weight: bold; color: #1877f2; }
-        input, button { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { background: #1877f2; color: white; border: none; cursor: pointer; }
+        .author { font-weight: bold; color: #1c1e21; }
+        #messenger { display: none; width: 500px; }
     </style>
 </head>
 <body>
-<h2>VOLE Messenger</h2>
-<div class="container" id="login-form">
-    <input type="text" id="username" placeholder="Ваше имя">
-    <button onclick="login()">Войти в мессенджер</button>
+
+<div id="auth" class="card">
+    <h2>VOLE</h2>
+    <input type="email" id="email" placeholder="Электронная почта">
+    <input type="password" id="pass" placeholder="Пароль">
+    <input type="text" id="nick" placeholder="Имя пользователя (для регистрации)">
+    <button onclick="auth('register')">Зарегистрироваться</button>
+    <button style="background: #42b72a;" onclick="auth('login')">Войти</button>
 </div>
 
-<div class="container" id="messenger" style="display:none;">
-    <div id="posts-red"></div>
-    <input type="text" id="postText" placeholder="Что нового?">
-    <button onclick="sendPost()">Опубликовать</button>
-</div>
-
-<script>
-    let currentUser = "";
-    function login() {
-        currentUser = document.getElementById('username').value;
-        if(currentUser) {
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('messenger').style.display = 'block';
-            loadPosts();
-        }
-    }
-    function loadPosts() {
-        fetch('/api/posts').then(r => r.json()).then(posts => {
-            let html = '';
-            posts.reverse().forEach(p => {
-                html += `<div class="post"><span class="post-author">${p.author}:</span> ${p.content}</div>`;
-            });
-            document.getElementById('posts-red').innerHTML = html;
-        });
-    }
-    function sendPost() {
-        const text = document.getElementById('postText').value;
-        fetch('/api/posts?author=' + currentUser + '&content=' + text, { method: 'POST' })
-            .then(() => {
-                document.getElementById('postText').value = '';
-                loadPosts();
-            });
-    }
-</script>
-</body>
-</html>
+<div id="messenger">
+    <div class="card">
+        <h3>Лента новостей</h3>
+        <div id="feed" style="max-height: 400px; overflow-y: auto; margin-bottom:
