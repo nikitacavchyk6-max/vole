@@ -1,64 +1,57 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
+    <title>VOLE Messenger</title>
     <meta charset="UTF-8">
-    <title>My Telegram Clone</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #afbecc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .chat-container { width: 400px; height: 600px; background: white; border-radius: 15px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .header { background: #517da2; color: white; padding: 15px; border-radius: 15px 15px 0 0; text-align: center; font-weight: bold; }
-        #messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #e7ebf0; }
-        .message { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 14px; position: relative; }
-        .message.received { background: white; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .message.sent { background: #effdde; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .author { font-weight: bold; font-size: 12px; color: #517da2; margin-bottom: 3px; display: block; }
-        .input-area { padding: 15px; display: flex; gap: 10px; background: white; border-radius: 0 0 15px 15px; }
-        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
-        button { background: #517da2; color: white; border: none; padding: 10px 15px; border-radius: 50%; cursor: pointer; }
+        body { font-family: Arial; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 400px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 20px; }
+        .post { border-bottom: 1px solid #eee; padding: 10px 0; }
+        .post-author { font-weight: bold; color: #1877f2; }
+        input, button { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { background: #1877f2; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
-<div class="chat-container">
-    <div class="header">Лабораторний Чат</div>
-    <div id="messages"></div>
-    <div class="input-area">
-        <input type="text" id="userInput" placeholder="Ваш нік..." style="width: 80px; flex: none;">
-        <input type="text" id="textInput" placeholder="Повідомлення..." onkeypress="if(event.keyCode==13) send()">
-        <button onclick="send()">></button>
-    </div>
+<h2>VOLE Messenger</h2>
+<div class="container" id="login-form">
+    <input type="text" id="username" placeholder="Ваше имя">
+    <button onclick="login()">Войти в мессенджер</button>
+</div>
+
+<div class="container" id="messenger" style="display:none;">
+    <div id="posts-red"></div>
+    <input type="text" id="postText" placeholder="Что нового?">
+    <button onclick="sendPost()">Опубликовать</button>
 </div>
 
 <script>
-    const myNameInput = document.getElementById('userInput');
-
-    async function fetchMessages() {
-        const res = await fetch('/api/messages');
-        const data = await res.json();
-        const container = document.getElementById('messages');
-        container.innerHTML = data.map(m => `
-                <div class="message ${m.author === myNameInput.value ? 'sent' : 'received'}">
-                    <span class="author">${m.author}</span>
-                    ${m.text}
-                </div>
-            `).join('');
-        container.scrollTop = container.scrollHeight;
+    let currentUser = "";
+    function login() {
+        currentUser = document.getElementById('username').value;
+        if(currentUser) {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('messenger').style.display = 'block';
+            loadPosts();
+        }
     }
-
-    async function send() {
-        const author = myNameInput.value;
-        const text = document.getElementById('textInput').value;
-        if (!author || !text) return;
-
-        await fetch('/api/messages', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ author, text })
+    function loadPosts() {
+        fetch('/api/posts').then(r => r.json()).then(posts => {
+            let html = '';
+            posts.reverse().forEach(p => {
+                html += `<div class="post"><span class="post-author">${p.author}:</span> ${p.content}</div>`;
+            });
+            document.getElementById('posts-red').innerHTML = html;
         });
-        document.getElementById('textInput').value = '';
-        fetchMessages();
     }
-
-    setInterval(fetchMessages, 1000); // Оновлення кожну секунду
+    function sendPost() {
+        const text = document.getElementById('postText').value;
+        fetch('/api/posts?author=' + currentUser + '&content=' + text, { method: 'POST' })
+            .then(() => {
+                document.getElementById('postText').value = '';
+                loadPosts();
+            });
+    }
 </script>
 </body>
 </html>
