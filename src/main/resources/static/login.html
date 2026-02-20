@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Threads Next Gen - Login</title>
+    <style>
+        body { background: #000; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .card { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #333; width: 300px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; }
+        button { width: 100%; padding: 10px; border-radius: 10px; background: #fff; color: #000; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Вход в Threads</h2>
+    <input id="user" placeholder="Логин">
+    <input id="pass" type="password" placeholder="Пароль">
+    <button onclick="auth('login')">Войти</button>
+    <button onclick="auth('register')" style="background: none; color: gray; margin-top: 10px;">Зарегистрироваться</button>
+</div>
+
+<script>
+    async function auth(type) {
+        const user = document.getElementById('user').value;
+        const pass = document.getElementById('pass').value;
+        const res = await fetch('/api/auth/' + type, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username: user, password: pass})
+        });
+        alert(await res.text());
+    }
+</script>
+</body>
+</html>
